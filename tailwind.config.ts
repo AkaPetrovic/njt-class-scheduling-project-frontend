@@ -9,15 +9,22 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        poppins: "var(--font-poppins)",
+        quicksand: "var(--font-quicksand)",
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+      },
+      animation: {
+        fadeIn: "fadeIn 0.5s ease-in forwards 0.3s", // 0.5s duration, ease-in timing, forwards fill mode, 1s delay
       },
     },
   },
-  plugins: [],
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: ["nord"],
+  },
 };
 export default config;

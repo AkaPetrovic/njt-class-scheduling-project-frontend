@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
+import { Quicksand } from "next/font/google";
 import "./globals.css";
 
-const poppins = Poppins({
+const quicksand = Quicksand({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-poppins",
+  variable: "--font-quicksand",
 });
 
 export const metadata: Metadata = {
@@ -19,8 +18,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="font-poppins font-medium bg-slate-200">{children}</body>
+    <html lang="en" data-theme="nord">
+      <body
+        className={`${quicksand.variable} font-quicksand font-medium h-screen bg-base-100`}
+      >
+        {children}
+      </body>
     </html>
   );
 }
