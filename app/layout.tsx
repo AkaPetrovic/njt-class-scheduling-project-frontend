@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="nord">
       <body
-        className={`${quicksand.variable} font-quicksand font-medium h-screen bg-base-100`}
+        className={`${quicksand.variable} font-quicksand font-medium w-screen h-screen bg-base-100`}
       >
         {children}
       </body>
