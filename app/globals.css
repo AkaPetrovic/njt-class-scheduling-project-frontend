@@ -6,4 +6,9 @@
   h1 {
     @apply text-2xl;
   }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    @apply appearance-none;
+  }
 }
