@@ -3,7 +3,8 @@ import AcademicYear from "@/app/types/AcademicYear";
 import ClassCoveragePlan from "@/app/types/ClassCoveragePlan";
 import Subject from "@/app/types/Subject";
 import TeachingStaff from "@/app/types/TeachingStaff";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 interface Props {
   classCoveragePlan: ClassCoveragePlan;
@@ -18,6 +19,12 @@ const ClassCoveragePlanDetailsForm = ({
   subjects,
   academicYears,
 }: Props) => {
+  const router = useRouter();
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const [dialogModalMessage, setDialogModalMessage] = useState("");
+  const [dialogModalMessageType, setDialogModalMessageType] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const [classCoveragePlanData, setClassCoveragePlanData] =
     useState(classCoveragePlan);
   const [selectedTeachingStaffId, setSelectedTeachingStaffId] = useState(
@@ -84,6 +91,39 @@ const ClassCoveragePlanDetailsForm = ({
     }
   }, [selectedAcademicYearId]);
 
+  useEffect(() => {
+    if (isDialogOpen && dialogRef.current) {
+      dialogRef.current.showModal();
+
+      // By default <dialog> HTML element closes on the press of the Esc key on keyboard
+      // the code that follows is preventing that from happening
+
+      // Add event listener to prevent default behavior on Esc key press
+      const preventEscClose = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+        }
+      };
+
+      dialogRef.current.addEventListener("keydown", preventEscClose);
+
+      // Cleanup function - called when the component is unmounted or when the effect dependencies change
+      // removing all the resources previously set by the effect function (like the event listener here)
+      return () => {
+        dialogRef.current?.removeEventListener("keydown", preventEscClose);
+      };
+    }
+  }, [isDialogOpen]);
+
+  const handleDialogModalClose = () => {
+    setIsDialogOpen(false);
+
+    if (dialogModalMessageType === "Success") {
+      setEditingMode(false);
+      router.push("/");
+    }
+  };
+
   const handleSave = async () => {
     try {
       const response = await fetch(
@@ -103,7 +143,9 @@ const ClassCoveragePlanDetailsForm = ({
       }
 
       const result = await response.text();
-      console.log("Success:", result);
+      setDialogModalMessage(result);
+      setDialogModalMessageType("Success");
+      setIsDialogOpen(true);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -269,6 +311,24 @@ const ClassCoveragePlanDetailsForm = ({
           </select>
         </div>
       </form>
+
+      {/* Modal dialog box */}
+      <dialog ref={dialogRef} data-keyboard="false" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Response message</h3>
+          <p className="py-4">{dialogModalMessage}</p>
+          <div className="modal-action">
+            <form method="dialog">
+              <button
+                className="btn focus:outline-none"
+                onClick={handleDialogModalClose}
+              >
+                Close
+              </button>
+            </form>
+          </div>
+        </div>
+      </dialog>
     </>
   );
 };
