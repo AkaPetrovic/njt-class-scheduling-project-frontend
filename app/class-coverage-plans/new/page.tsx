@@ -2,6 +2,8 @@ import AcademicYear from "@/app/types/AcademicYear";
 import Subject from "@/app/types/Subject";
 import TeachingStaff from "@/app/types/TeachingStaff";
 import ClassCoveragePlanAddNewForm from "./ClassCoveragePlanAddNewForm";
+import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import Link from "next/link";
 
 const AddNewClassCoveragePlanPage = async () => {
   const resTeachingStaff = await fetch(
@@ -26,8 +28,14 @@ const AddNewClassCoveragePlanPage = async () => {
   const academicYears: AcademicYear[] = await resAcademicYears.json();
 
   return (
-    <main className="flex flex-col items-center h-full w-full">
-      <div className="relative top-36 w-1/2">
+    <main className="flex flex-col justify-center items-center relative h-full w-full">
+      <Link
+        href="/class-coverage-plans"
+        className="btn btn-ghost rounded-full absolute top-4 left-6 p-3"
+      >
+        <ArrowBackIosNewRoundedIcon />
+      </Link>
+      <div>
         <h1>Add new class coverage plan</h1>
         <ClassCoveragePlanAddNewForm
           teachingStaff={teachingStaff}

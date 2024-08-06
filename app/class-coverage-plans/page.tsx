@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ClassCoveragePlan from "../types/ClassCoveragePlan";
+import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 
 const ClassCoveragePlansPage = async () => {
   const res = await fetch("http://localhost:8080/api/class-coverage-plans", {
@@ -8,7 +9,13 @@ const ClassCoveragePlansPage = async () => {
   const classCoveragePlans: ClassCoveragePlan[] = await res.json();
 
   return (
-    <main className="flex justify-center items-center w-full h-full">
+    <main className="flex justify-center items-center relative w-full h-full">
+      <Link
+        href="/"
+        className="btn btn-ghost rounded-full absolute top-4 left-6 p-3"
+      >
+        <ArrowBackIosNewRoundedIcon />
+      </Link>
       <div className="w-3/5">
         <h1 className="mb-5">Class coverage plans</h1>
         <table className="table table-lg">
