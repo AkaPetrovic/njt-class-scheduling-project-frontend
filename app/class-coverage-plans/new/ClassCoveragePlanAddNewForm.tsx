@@ -46,7 +46,7 @@ const ClassCoveragePlanAddNewForm = ({
     const { name, value } = e.target;
     setClassCoveragePlanData((prevData) => ({
       ...prevData,
-      [name]: value ? Number(value) : 0,
+      [name]: value ? (Number(value) >= 0 ? Number(value) : 0) : 0,
     }));
   };
 
@@ -275,7 +275,7 @@ const ClassCoveragePlanAddNewForm = ({
       </form>
 
       {/* Modal dialog box */}
-      <dialog ref={dialogRef} data-keyboard="false" className="modal">
+      <dialog ref={dialogRef} className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Response message</h3>
           <p className="py-4">{dialogModalMessage}</p>

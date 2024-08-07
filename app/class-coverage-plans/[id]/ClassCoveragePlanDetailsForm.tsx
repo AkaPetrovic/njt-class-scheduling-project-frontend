@@ -20,10 +20,19 @@ const ClassCoveragePlanDetailsForm = ({
   academicYears,
 }: Props) => {
   const router = useRouter();
-  const dialogRef = useRef<HTMLDialogElement | null>(null);
-  const [dialogModalMessage, setDialogModalMessage] = useState("");
-  const [dialogModalMessageType, setDialogModalMessageType] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Feedback dialog related states and refs
+  const feedbackDialogRef = useRef<HTMLDialogElement | null>(null);
+  const [feedBackDialogModalMessage, setFeedbackDialogModalMessage] =
+    useState("");
+  const [feedbackDialogModalMessageType, setFeedbackDialogModalMessageType] =
+    useState("");
+  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
+
+  //Confirm delete dialog related states and refs
+  const confirmDeleteDialogRef = useRef<HTMLDialogElement | null>(null);
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
+    useState(false);
 
   const [classCoveragePlanData, setClassCoveragePlanData] =
     useState(classCoveragePlan);
@@ -40,9 +49,10 @@ const ClassCoveragePlanDetailsForm = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setClassCoveragePlanData((prevData) => ({
       ...prevData,
-      [name]: value ? Number(value) : 0,
+      [name]: value ? (Number(value) >= 0 ? Number(value) : 0) : 0,
     }));
   };
 
@@ -92,8 +102,8 @@ const ClassCoveragePlanDetailsForm = ({
   }, [selectedAcademicYearId]);
 
   useEffect(() => {
-    if (isDialogOpen && dialogRef.current) {
-      dialogRef.current.showModal();
+    if (isFeedbackDialogOpen && feedbackDialogRef.current) {
+      feedbackDialogRef.current.showModal();
 
       // By default <dialog> HTML element closes on the press of the Esc key on keyboard
       // the code that follows is preventing that from happening
@@ -105,20 +115,53 @@ const ClassCoveragePlanDetailsForm = ({
         }
       };
 
-      dialogRef.current.addEventListener("keydown", preventEscClose);
+      feedbackDialogRef.current.addEventListener("keydown", preventEscClose);
 
       // Cleanup function - called when the component is unmounted or when the effect dependencies change
       // removing all the resources previously set by the effect function (like the event listener here)
       return () => {
-        dialogRef.current?.removeEventListener("keydown", preventEscClose);
+        feedbackDialogRef.current?.removeEventListener(
+          "keydown",
+          preventEscClose
+        );
       };
     }
-  }, [isDialogOpen]);
+  }, [isFeedbackDialogOpen]);
 
-  const handleDialogModalClose = () => {
-    setIsDialogOpen(false);
+  useEffect(() => {
+    if (isConfirmDeleteDialogOpen && confirmDeleteDialogRef.current) {
+      confirmDeleteDialogRef.current.showModal();
 
-    if (dialogModalMessageType === "Success") {
+      // By default <dialog> HTML element closes on the press of the Esc key on keyboard
+      // the code that follows is preventing that from happening
+
+      // Add event listener to prevent default behavior on Esc key press
+      const preventEscClose = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+        }
+      };
+
+      confirmDeleteDialogRef.current.addEventListener(
+        "keydown",
+        preventEscClose
+      );
+
+      // Cleanup function - called when the component is unmounted or when the effect dependencies change
+      // removing all the resources previously set by the effect function (like the event listener here)
+      return () => {
+        confirmDeleteDialogRef.current?.removeEventListener(
+          "keydown",
+          preventEscClose
+        );
+      };
+    }
+  }, [isConfirmDeleteDialogOpen]);
+
+  const handleFeedbackDialogModalClose = () => {
+    setIsFeedbackDialogOpen(false);
+
+    if (feedbackDialogModalMessageType === "Success") {
       setEditingMode(false);
       router.push("/");
     }
@@ -143,9 +186,36 @@ const ClassCoveragePlanDetailsForm = ({
       }
 
       const result = await response.text();
-      setDialogModalMessage(result);
-      setDialogModalMessageType("Success");
-      setIsDialogOpen(true);
+      setFeedbackDialogModalMessage(result);
+      setFeedbackDialogModalMessageType("Success");
+      setIsFeedbackDialogOpen(true);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/class-coverage-plans/delete",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(classCoveragePlanData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+
+      const result = await response.text();
+      setFeedbackDialogModalMessage(result);
+      setFeedbackDialogModalMessageType("Success");
+      setIsFeedbackDialogOpen(true);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -166,7 +236,11 @@ const ClassCoveragePlanDetailsForm = ({
         >
           {editingMode ? "Cancel editing" : "Edit"}
         </button>
-        <button className="btn mr-2" disabled={editingMode}>
+        <button
+          className="btn mr-2"
+          disabled={editingMode}
+          onClick={() => setIsConfirmDeleteDialogOpen(true)}
+        >
           Delete
         </button>
         <button
@@ -312,18 +386,49 @@ const ClassCoveragePlanDetailsForm = ({
         </div>
       </form>
 
-      {/* Modal dialog box */}
-      <dialog ref={dialogRef} data-keyboard="false" className="modal">
+      {/* Modal feedback dialog box */}
+      <dialog ref={feedbackDialogRef} className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Response message</h3>
-          <p className="py-4">{dialogModalMessage}</p>
+          <p className="py-4">{feedBackDialogModalMessage}</p>
           <div className="modal-action">
             <form method="dialog">
               <button
                 className="btn focus:outline-none"
-                onClick={handleDialogModalClose}
+                onClick={handleFeedbackDialogModalClose}
               >
                 Close
+              </button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+
+      {/* Modal confirm delete dialog box */}
+      <dialog ref={confirmDeleteDialogRef} className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Confirm removal</h3>
+          <p className="py-4">
+            Are you sure that you want to delete this class coverage plan?
+          </p>
+          <div className="modal-action">
+            <form method="dialog">
+              <button
+                className="btn focus:outline-none mr-4"
+                onClick={() => {
+                  setIsConfirmDeleteDialogOpen(false);
+                }}
+              >
+                No
+              </button>
+              <button
+                className="btn focus:outline-none"
+                onClick={() => {
+                  setIsConfirmDeleteDialogOpen(false);
+                  handleDelete();
+                }}
+              >
+                Yes
               </button>
             </form>
           </div>
