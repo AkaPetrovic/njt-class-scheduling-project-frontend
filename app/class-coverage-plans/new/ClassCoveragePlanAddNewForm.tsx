@@ -127,6 +127,11 @@ const ClassCoveragePlanAddNewForm = ({
     }
   };
 
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
+
   const handleSave = async () => {
     try {
       const response = await fetch(
@@ -135,6 +140,7 @@ const ClassCoveragePlanAddNewForm = ({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(classCoveragePlanData),
         }

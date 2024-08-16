@@ -167,6 +167,11 @@ const ClassCoveragePlanDetailsForm = ({
     }
   };
 
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1];
+
   const handleSave = async () => {
     try {
       const response = await fetch(
@@ -175,6 +180,7 @@ const ClassCoveragePlanDetailsForm = ({
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(classCoveragePlanData),
         }
@@ -202,6 +208,7 @@ const ClassCoveragePlanDetailsForm = ({
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(classCoveragePlanData),
         }

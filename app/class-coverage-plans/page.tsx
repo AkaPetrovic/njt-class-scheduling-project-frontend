@@ -1,10 +1,17 @@
 import Link from "next/link";
 import ClassCoveragePlan from "../types/ClassCoveragePlan";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import { cookies } from "next/headers";
 
 const ClassCoveragePlansPage = async () => {
+  const cookieStore = cookies();
+  const token = cookieStore.get("token")?.value;
+
   const res = await fetch("http://localhost:8080/api/class-coverage-plans", {
     cache: "no-store",
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },
   });
   const classCoveragePlans: ClassCoveragePlan[] = await res.json();
 

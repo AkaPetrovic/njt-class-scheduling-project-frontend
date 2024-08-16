@@ -1,10 +1,17 @@
 import Link from "next/link";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import Subject from "../types/Subject";
+import { cookies } from "next/headers";
 
 const SubjectsPage = async () => {
+  const cookieStore = cookies();
+  const token = cookieStore.get("token")?.value;
+
   const res = await fetch("http://localhost:8080/api/subjects", {
     cache: "no-store",
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },
   });
   const subjects: Subject[] = await res.json();
 

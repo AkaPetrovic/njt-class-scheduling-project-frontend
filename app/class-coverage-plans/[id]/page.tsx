@@ -6,6 +6,7 @@ import Subject from "@/app/types/Subject";
 import AcademicYear from "@/app/types/AcademicYear";
 import Link from "next/link";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import { cookies } from "next/headers";
 
 interface Props {
   params: {
@@ -14,10 +15,16 @@ interface Props {
 }
 
 const ClassCoveragePlanDetailsPage = async ({ params: { id } }: Props) => {
+  const cookieStore = cookies();
+  const token = cookieStore.get("token")?.value;
+
   const resClassCoveragePlan = await fetch(
     `http://localhost:8080/api/class-coverage-plans/${id}`,
     {
       cache: "no-store",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     }
   );
   const classCoveragePlan: ClassCoveragePlan =
@@ -27,12 +34,18 @@ const ClassCoveragePlanDetailsPage = async ({ params: { id } }: Props) => {
     `http://localhost:8080/api/teaching-staff`,
     {
       cache: "no-store",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     }
   );
   const teachingStaff: TeachingStaff[] = await resTeachingStaff.json();
 
   const resSubjects = await fetch(`http://localhost:8080/api/subjects`, {
     cache: "no-store",
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },
   });
   const subjects: Subject[] = await resSubjects.json();
 
@@ -40,6 +53,9 @@ const ClassCoveragePlanDetailsPage = async ({ params: { id } }: Props) => {
     `http://localhost:8080/api/academic-years`,
     {
       cache: "no-store",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     }
   );
   const academicYears: AcademicYear[] = await resAcademicYears.json();

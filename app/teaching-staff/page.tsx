@@ -1,10 +1,17 @@
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import Link from "next/link";
 import TeachingStaff from "../types/TeachingStaff";
+import { cookies } from "next/headers";
 
 const TeachingStaffPage = async () => {
+  const cookieStore = cookies();
+  const token = cookieStore.get("token")?.value;
+
   const res = await fetch("http://localhost:8080/api/teaching-staff", {
     cache: "no-store",
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },
   });
   const teachingStaff: TeachingStaff[] = await res.json();
 

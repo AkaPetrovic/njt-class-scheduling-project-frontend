@@ -4,18 +4,28 @@ import TeachingStaff from "@/app/types/TeachingStaff";
 import ClassCoveragePlanAddNewForm from "./ClassCoveragePlanAddNewForm";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 const AddNewClassCoveragePlanPage = async () => {
+  const cookieStore = cookies();
+  const token = cookieStore.get("token")?.value;
+
   const resTeachingStaff = await fetch(
     `http://localhost:8080/api/teaching-staff`,
     {
       cache: "no-store",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     }
   );
   const teachingStaff: TeachingStaff[] = await resTeachingStaff.json();
 
   const resSubjects = await fetch(`http://localhost:8080/api/subjects`, {
     cache: "no-store",
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },
   });
   const subjects: Subject[] = await resSubjects.json();
 
@@ -23,6 +33,9 @@ const AddNewClassCoveragePlanPage = async () => {
     `http://localhost:8080/api/academic-years`,
     {
       cache: "no-store",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     }
   );
   const academicYears: AcademicYear[] = await resAcademicYears.json();
