@@ -2,10 +2,13 @@ import Link from "next/link";
 import ClassCoveragePlan from "../types/ClassCoveragePlan";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import { cookies } from "next/headers";
+import { decodeToken } from "../utility/auth";
 
 const ClassCoveragePlansPage = async () => {
   const cookieStore = cookies();
   const token = cookieStore.get("token")?.value;
+  const decodedToken = decodeToken(token);
+  const role = decodedToken && decodedToken.role ? decodedToken.role : null;
 
   const res = await fetch("http://localhost:8080/api/class-coverage-plans", {
     cache: "no-store",
@@ -40,79 +43,121 @@ const ClassCoveragePlansPage = async () => {
           <tbody className="[&_tr:not(:last-child)]:border-b [&_tr:not(:last-child)]:border-base-300">
             {classCoveragePlans.map((classCoveragePlan: ClassCoveragePlan) => (
               <tr
-                className="hover:bg-base-200 transition-colors duration-300 [&_td]:p-0"
+                className={`hover:bg-base-200 transition-colors duration-300 ${
+                  role === "ADMIN" ? "[&_td]:p-0" : ""
+                }`}
                 key={classCoveragePlan.id}
               >
                 <td>
-                  <Link
-                    className="block px-6 py-4"
-                    href={`/class-coverage-plans/${classCoveragePlan.id}`}
-                  >
-                    {classCoveragePlan.id}
-                  </Link>
+                  {role === "ADMIN" ? (
+                    <Link
+                      className="block px-6 py-4"
+                      href={`/class-coverage-plans/${classCoveragePlan.id}`}
+                    >
+                      {classCoveragePlan.id}
+                    </Link>
+                  ) : (
+                    classCoveragePlan.id
+                  )}
                 </td>
                 <td>
-                  <Link
-                    className="block px-6 py-4"
-                    href={`/class-coverage-plans/${classCoveragePlan.id}`}
-                  >
-                    {classCoveragePlan.amountOfLectureClassesPerTeachingStaff}
-                  </Link>
+                  {role === "ADMIN" ? (
+                    <Link
+                      className="block px-6 py-4"
+                      href={`/class-coverage-plans/${classCoveragePlan.id}`}
+                    >
+                      {classCoveragePlan.amountOfLectureClassesPerTeachingStaff}
+                    </Link>
+                  ) : (
+                    classCoveragePlan.amountOfLectureClassesPerTeachingStaff
+                  )}
                 </td>
                 <td>
-                  <Link
-                    className="block px-6 py-4"
-                    href={`/class-coverage-plans/${classCoveragePlan.id}`}
-                  >
-                    {classCoveragePlan.amountOfPracticalClassesPerTeachingStaff}
-                  </Link>
+                  {role === "ADMIN" ? (
+                    <Link
+                      className="block px-6 py-4"
+                      href={`/class-coverage-plans/${classCoveragePlan.id}`}
+                    >
+                      {
+                        classCoveragePlan.amountOfPracticalClassesPerTeachingStaff
+                      }
+                    </Link>
+                  ) : (
+                    classCoveragePlan.amountOfPracticalClassesPerTeachingStaff
+                  )}
                 </td>
                 <td>
-                  <Link
-                    className="block px-6 py-4"
-                    href={`/class-coverage-plans/${classCoveragePlan.id}`}
-                  >
-                    {
-                      classCoveragePlan.amountOfLabPracticalClassesPerTeachingStaff
-                    }
-                  </Link>
+                  {role === "ADMIN" ? (
+                    <Link
+                      className="block px-6 py-4"
+                      href={`/class-coverage-plans/${classCoveragePlan.id}`}
+                    >
+                      {
+                        classCoveragePlan.amountOfLabPracticalClassesPerTeachingStaff
+                      }
+                    </Link>
+                  ) : (
+                    classCoveragePlan.amountOfLabPracticalClassesPerTeachingStaff
+                  )}
                 </td>
                 <td>
-                  <Link
-                    className="block px-6 py-4"
-                    href={`/class-coverage-plans/${classCoveragePlan.id}`}
-                  >
-                    {classCoveragePlan.teachingStaff.name +
-                      " " +
-                      classCoveragePlan.teachingStaff.surname +
-                      " (" +
-                      classCoveragePlan.teachingStaff.title.title +
-                      ")"}
-                  </Link>
+                  {role === "ADMIN" ? (
+                    <Link
+                      className="block px-6 py-4"
+                      href={`/class-coverage-plans/${classCoveragePlan.id}`}
+                    >
+                      {classCoveragePlan.teachingStaff.name +
+                        " " +
+                        classCoveragePlan.teachingStaff.surname +
+                        " (" +
+                        classCoveragePlan.teachingStaff.title.title +
+                        ")"}
+                    </Link>
+                  ) : (
+                    classCoveragePlan.teachingStaff.name +
+                    " " +
+                    classCoveragePlan.teachingStaff.surname +
+                    " (" +
+                    classCoveragePlan.teachingStaff.title.title +
+                    ")"
+                  )}
                 </td>
                 <td>
-                  <Link
-                    className="block px-6 py-4"
-                    href={`/class-coverage-plans/${classCoveragePlan.id}`}
-                  >
-                    {classCoveragePlan.subject.name}
-                  </Link>
+                  {role === "ADMIN" ? (
+                    <Link
+                      className="block px-6 py-4"
+                      href={`/class-coverage-plans/${classCoveragePlan.id}`}
+                    >
+                      {classCoveragePlan.subject.name}
+                    </Link>
+                  ) : (
+                    classCoveragePlan.subject.name
+                  )}
                 </td>
                 <td>
-                  <Link
-                    className="block px-6 py-4"
-                    href={`/class-coverage-plans/${classCoveragePlan.id}`}
-                  >
-                    {classCoveragePlan.academicYear.name}
-                  </Link>
+                  {role === "ADMIN" ? (
+                    <Link
+                      className="block px-6 py-4"
+                      href={`/class-coverage-plans/${classCoveragePlan.id}`}
+                    >
+                      {classCoveragePlan.academicYear.name}
+                    </Link>
+                  ) : (
+                    classCoveragePlan.academicYear.name
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <Link className="btn btn-neutral mt-5" href="/class-coverage-plans/new">
-          Add new
-        </Link>
+        {role === "ADMIN" ? (
+          <Link
+            className="btn btn-neutral mt-5"
+            href="/class-coverage-plans/new"
+          >
+            Add new
+          </Link>
+        ) : null}
       </div>
     </main>
   );

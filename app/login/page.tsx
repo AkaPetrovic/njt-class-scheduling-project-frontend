@@ -1,13 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import { useContext, useState } from "react";
+import { TokenContext } from "../utility/context/TokenContext";
+import { decodeToken } from "../utility/auth";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  const { setTokenValue } = useContext(TokenContext);
 
   const router = useRouter();
 
@@ -36,13 +38,16 @@ const LoginPage = () => {
         const errorText = await response.text();
         throw new Error(errorText);
       }
-      const token = await response.text();
 
+      const token = await response.text();
       document.cookie = `token=${token}; path=/; max-age=${
         60 * 60 * 24
       }; secure; samesite=lax;`;
-
-      router.push("/");
+      setTokenValue(decodeToken(token));
+      // router.push("/"); //middleware doesn't work as expected
+      window.location.href = "/";
+      //with this the middleware is always working as expected with different user roles,
+      //not a great solution (because it forces a refresh)
     } catch (error) {
       console.error("Login failed. Error:", error);
     }

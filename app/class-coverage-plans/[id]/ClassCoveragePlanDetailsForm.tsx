@@ -167,13 +167,13 @@ const ClassCoveragePlanDetailsForm = ({
     }
   };
 
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("token="))
-    ?.split("=")[1];
-
   const handleSave = async () => {
     try {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1];
+
       const response = await fetch(
         "http://localhost:8080/api/class-coverage-plans/edit",
         {
@@ -202,6 +202,11 @@ const ClassCoveragePlanDetailsForm = ({
 
   const handleDelete = async () => {
     try {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1];
+
       const response = await fetch(
         "http://localhost:8080/api/class-coverage-plans/delete",
         {

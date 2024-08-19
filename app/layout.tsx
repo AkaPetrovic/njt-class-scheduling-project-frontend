@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import "./globals.css";
+import Profile from "./Profile";
+import { TokenContextProvider } from "./utility/context/TokenContext";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -22,7 +24,10 @@ export default function RootLayout({
       <body
         className={`${quicksand.variable} font-quicksand font-medium w-screen h-screen bg-base-100`}
       >
-        {children}
+        <TokenContextProvider>
+          <Profile />
+          {children}
+        </TokenContextProvider>
       </body>
     </html>
   );
