@@ -1,11 +1,8 @@
-// "use client";
 import ClassCoveragePlan from "@/app/types/ClassCoveragePlan";
 import TeachingStaff from "@/app/types/TeachingStaff";
 import ClassCoveragePlanDetailsForm from "./ClassCoveragePlanDetailsForm";
 import Subject from "@/app/types/Subject";
 import AcademicYear from "@/app/types/AcademicYear";
-import Link from "next/link";
-import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import { cookies } from "next/headers";
 
 interface Props {
@@ -62,12 +59,6 @@ const ClassCoveragePlanDetailsPage = async ({ params: { id } }: Props) => {
 
   return (
     <main className="flex flex-col justify-center items-center h-full w-full">
-      <Link
-        href="/class-coverage-plans"
-        className="btn btn-ghost rounded-full absolute top-4 left-6 p-3"
-      >
-        <ArrowBackIosNewRoundedIcon />
-      </Link>
       <div>
         <h1>[{id}] Class coverage plan</h1>
         <ClassCoveragePlanDetailsForm

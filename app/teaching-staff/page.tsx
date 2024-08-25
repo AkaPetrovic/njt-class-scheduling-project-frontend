@@ -1,5 +1,3 @@
-import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
-import Link from "next/link";
 import TeachingStaff from "../types/TeachingStaff";
 import { cookies } from "next/headers";
 
@@ -17,12 +15,6 @@ const TeachingStaffPage = async () => {
 
   return (
     <main className="flex justify-center items-center relative w-full h-full">
-      <Link
-        href="/"
-        className="btn btn-ghost rounded-full absolute top-4 left-6 p-3"
-      >
-        <ArrowBackIosNewRoundedIcon />
-      </Link>
       <div className="w-3/5">
         <h1 className="mb-5">Teaching staff</h1>
         <table className="table table-lg">

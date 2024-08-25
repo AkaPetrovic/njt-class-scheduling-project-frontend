@@ -2,8 +2,6 @@ import AcademicYear from "@/app/types/AcademicYear";
 import Subject from "@/app/types/Subject";
 import TeachingStaff from "@/app/types/TeachingStaff";
 import ClassCoveragePlanAddNewForm from "./ClassCoveragePlanAddNewForm";
-import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
-import Link from "next/link";
 import { cookies } from "next/headers";
 
 const AddNewClassCoveragePlanPage = async () => {
@@ -42,12 +40,6 @@ const AddNewClassCoveragePlanPage = async () => {
 
   return (
     <main className="flex flex-col justify-center items-center relative h-full w-full">
-      <Link
-        href="/class-coverage-plans"
-        className="btn btn-ghost rounded-full absolute top-4 left-6 p-3"
-      >
-        <ArrowBackIosNewRoundedIcon />
-      </Link>
       <div>
         <h1>Add new class coverage plan</h1>
         <ClassCoveragePlanAddNewForm
