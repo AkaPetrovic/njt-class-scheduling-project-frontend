@@ -12,7 +12,6 @@ const Header = () => {
         pathname === "/" ? "justify-end" : "justify-between"
       } gap-3 mt-2 w-full`}
     >
-      <ReturnButton />
       <NavBar />
       <Profile />
     </div>

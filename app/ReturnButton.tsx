@@ -2,7 +2,6 @@
 import Link from "next/link";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 
 const ReturnButton = () => {
   const pathname = usePathname();

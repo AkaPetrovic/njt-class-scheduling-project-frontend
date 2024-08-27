@@ -7,7 +7,7 @@ const NavBar = () => {
 
   if (pathname !== "/" && pathname !== "/login") {
     return (
-      <nav className="navbar shadow rounded-full w-auto flex-grow">
+      <nav className="navbar shadow rounded-r-full w-auto flex-grow">
         <Link href="/" className="btn btn-sm text-base btn-ghost ml-4">
           Home
         </Link>
