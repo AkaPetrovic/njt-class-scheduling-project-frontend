@@ -5,15 +5,15 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const { pathname } = request.nextUrl;
   const role = extractUserRole(token);
-  const restrictedRoutesForUser = ["/class-coverage-plans/new"];
+
+  // Pattern for dynamic routes with academic year and subject
+  const restrictedRoutesPattern =
+    /^\/class-coverage-plans\/\d{4}-\d{2}\/[\w%20]+\/(new|\d+)$/;
 
   if (isAuthenticated(token)) {
     if (pathname === "/login") {
       return NextResponse.redirect(new URL("/", request.url));
-    } else if (
-      role === "USER" &&
-      isRouteRestrictedForUser(request, restrictedRoutesForUser)
-    ) {
+    } else if (role === "USER" && restrictedRoutesPattern.test(pathname)) {
       return NextResponse.redirect(new URL("/", request.url));
     } else {
       return NextResponse.next();
@@ -25,21 +25,6 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
-}
-
-function isRouteRestrictedForUser(
-  request: NextRequest,
-  restrictedRoutes: string[]
-) {
-  return (
-    restrictedRoutes.includes(request.nextUrl.pathname) ||
-    isDynamicClassCoveragePlanRoute(request)
-  );
-}
-
-function isDynamicClassCoveragePlanRoute(request: NextRequest): boolean {
-  const dynamicRoutePattern = /^\/class-coverage-plans\/\d+$/;
-  return dynamicRoutePattern.test(request.nextUrl.pathname);
 }
 
 export const config = {

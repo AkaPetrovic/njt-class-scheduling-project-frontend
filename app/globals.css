@@ -7,6 +7,14 @@
     @apply text-2xl;
   }
 
+  h2 {
+    @apply text-xl;
+  }
+
+  h3 {
+    @apply text-lg;
+  }
+
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button {
     @apply appearance-none;

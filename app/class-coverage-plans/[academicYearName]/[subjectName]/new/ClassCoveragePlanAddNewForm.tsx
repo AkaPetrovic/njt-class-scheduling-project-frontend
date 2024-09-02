@@ -4,21 +4,42 @@ import AcademicYear from "@/app/types/AcademicYear";
 import ClassCoveragePlan from "@/app/types/ClassCoveragePlan";
 import Subject from "@/app/types/Subject";
 import TeachingStaff from "@/app/types/TeachingStaff";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 interface Props {
-  teachingStaff: TeachingStaff[];
-  subjects: Subject[];
-  academicYears: AcademicYear[];
+  availableTeachingStaff: TeachingStaff[];
+  subject: Subject;
+  academicYear: AcademicYear;
+  unassignedLectureClasses: number;
+  unassignedPracticalClasses: number;
+  unassignedLabPracticalClasses: number;
 }
 
 const ClassCoveragePlanAddNewForm = ({
-  teachingStaff,
-  subjects,
-  academicYears,
+  availableTeachingStaff,
+  subject,
+  academicYear,
+  unassignedLectureClasses,
+  unassignedPracticalClasses,
+  unassignedLabPracticalClasses,
 }: Props) => {
   const router = useRouter();
+  const pathname = usePathname();
+
+  //By default this would never happen, but in case someone manually visits this route
+  //this prevents the error from happeneing and tells the user to return to the selection form
+  if (availableTeachingStaff.length === 0) {
+    return (
+      <div className="text-neutral-400 font-normal">
+        <h1>
+          No teaching staff is available at the moment, please return to the
+          selection page
+        </h1>
+      </div>
+    );
+  }
+
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [dialogModalMessage, setDialogModalMessage] = useState("");
   const [dialogModalMessageType, setDialogModalMessageType] = useState("");
@@ -29,31 +50,41 @@ const ClassCoveragePlanAddNewForm = ({
       amountOfLectureClassesPerTeachingStaff: 0,
       amountOfPracticalClassesPerTeachingStaff: 0,
       amountOfLabPracticalClassesPerTeachingStaff: 0,
-      teachingStaff: teachingStaff[0],
-      subject: subjects[0],
-      academicYear: academicYears[0],
+      teachingStaff: availableTeachingStaff[0],
+      subject: subject,
+      academicYear: academicYear,
     });
+
   const [selectedTeachingStaffId, setSelectedTeachingStaffId] = useState(
     classCoveragePlanData.teachingStaff.id
   );
-  const [selectedSubjectId, setSelectedSubjectId] = useState(
-    classCoveragePlanData.subject.id
-  );
-  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState(
-    classCoveragePlanData.academicYear.id
-  );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    upperLimit: number
+  ) => {
     const { name, value } = e.target;
+
+    // Convert input value to a number (or handle empty value)
+    let newValue = value ? Number(value) : 0;
+
+    // Validate the value to ensure it stays within limits
+    if (newValue < 0) {
+      newValue = 0;
+    } else if (newValue > upperLimit) {
+      newValue = upperLimit;
+    }
+
+    // Update state with validated value
     setClassCoveragePlanData((prevData) => ({
       ...prevData,
-      [name]: value ? (Number(value) >= 0 ? Number(value) : 0) : 0,
+      [name]: newValue,
     }));
   };
 
   //For handling teaching staff change
   useEffect(() => {
-    const teachingStaffById = teachingStaff.find(
+    const teachingStaffById = availableTeachingStaff.find(
       (staff) => staff.id === selectedTeachingStaffId
     );
 
@@ -65,36 +96,6 @@ const ClassCoveragePlanAddNewForm = ({
       }));
     }
   }, [selectedTeachingStaffId]);
-
-  //For handling subject change
-  useEffect(() => {
-    const subjectById = subjects.find(
-      (subject) => subject.id === selectedSubjectId
-    );
-
-    //If a subject has been found by the find() function
-    if (subjectById !== undefined) {
-      setClassCoveragePlanData((prevData) => ({
-        ...prevData,
-        subject: subjectById,
-      }));
-    }
-  }, [selectedSubjectId]);
-
-  //For handling academic year change
-  useEffect(() => {
-    const academicYearById = academicYears.find(
-      (academicYear) => academicYear.id === selectedAcademicYearId
-    );
-
-    //If an academic year has been found by the find() function
-    if (academicYearById !== undefined) {
-      setClassCoveragePlanData((prevData) => ({
-        ...prevData,
-        academicYear: academicYearById,
-      }));
-    }
-  }, [selectedAcademicYearId]);
 
   useEffect(() => {
     if (isDialogOpen && dialogRef.current) {
@@ -124,7 +125,8 @@ const ClassCoveragePlanAddNewForm = ({
     setIsDialogOpen(false);
 
     if (dialogModalMessageType === "Success") {
-      router.push("/");
+      const nextPath = pathname.split("/").slice(0, -1).join("/") + "/";
+      router.push(nextPath);
     }
   };
 
@@ -163,6 +165,7 @@ const ClassCoveragePlanAddNewForm = ({
 
   return (
     <>
+      <h1>Add new class coverage plan</h1>
       <div className="mt-5">
         <button className="btn btn-neutral" onClick={handleSave}>
           Save
@@ -175,7 +178,10 @@ const ClassCoveragePlanAddNewForm = ({
             htmlFor="amountOfLectureClassesPerTeachingStaff"
             className="mb-1"
           >
-            Amount of lecture classes:
+            Amount of lecture classes:{" "}
+            <span className="text-neutral-400">
+              (available: {unassignedLectureClasses})
+            </span>
           </label>
           <input
             id="amountOfLectureClassesPerTeachingStaff"
@@ -183,7 +189,7 @@ const ClassCoveragePlanAddNewForm = ({
             type="number"
             value={classCoveragePlanData.amountOfLectureClassesPerTeachingStaff}
             className="input input-bordered w-full max-w-20"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, unassignedLectureClasses)}
           />
         </div>
 
@@ -192,7 +198,10 @@ const ClassCoveragePlanAddNewForm = ({
             htmlFor="amountOfPracticalClassesPerTeachingStaff"
             className="mb-1"
           >
-            Amount of practical classes:
+            Amount of practical classes:{" "}
+            <span className="text-neutral-400">
+              (available: {unassignedPracticalClasses})
+            </span>
           </label>
           <input
             id="amountOfPracticalClassesPerTeachingStaff"
@@ -202,7 +211,7 @@ const ClassCoveragePlanAddNewForm = ({
               classCoveragePlanData.amountOfPracticalClassesPerTeachingStaff
             }
             className="input input-bordered w-full max-w-20"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, unassignedPracticalClasses)}
           />
         </div>
 
@@ -211,7 +220,10 @@ const ClassCoveragePlanAddNewForm = ({
             htmlFor="amountOfLabPracticalClassesPerTeachingStaff"
             className="mb-1"
           >
-            Amount of lab classes:
+            Amount of lab classes:{" "}
+            <span className="text-neutral-400">
+              (available: {unassignedLabPracticalClasses})
+            </span>
           </label>
           <input
             id="amountOfLabPracticalClassesPerTeachingStaff"
@@ -221,7 +233,9 @@ const ClassCoveragePlanAddNewForm = ({
               classCoveragePlanData.amountOfLabPracticalClassesPerTeachingStaff
             }
             className="input input-bordered w-full max-w-20"
-            onChange={handleInputChange}
+            onChange={(e) =>
+              handleInputChange(e, unassignedLabPracticalClasses)
+            }
           />
         </div>
 
@@ -235,7 +249,7 @@ const ClassCoveragePlanAddNewForm = ({
             value={selectedTeachingStaffId}
             onChange={(e) => setSelectedTeachingStaffId(Number(e.target.value))}
           >
-            {teachingStaff.map((staff) => (
+            {availableTeachingStaff.map((staff) => (
               <option
                 key={staff.id}
                 value={staff.id}
@@ -251,14 +265,10 @@ const ClassCoveragePlanAddNewForm = ({
           <select
             id="classCoveragePlanSubject"
             className="select select-bordered w-full max-w-xs"
-            value={selectedSubjectId}
-            onChange={(e) => setSelectedSubjectId(Number(e.target.value))}
+            value={subject.id}
+            disabled
           >
-            {subjects.map((subject) => (
-              <option key={subject.id} value={subject.id}>
-                {subject.name}
-              </option>
-            ))}
+            <option value={subject.id}>{subject.name}</option>
           </select>
         </div>
 
@@ -269,14 +279,10 @@ const ClassCoveragePlanAddNewForm = ({
           <select
             id="classCoveragePlanAcademicYear"
             className="select select-bordered w-full max-w-xs"
-            value={selectedAcademicYearId}
-            onChange={(e) => setSelectedAcademicYearId(Number(e.target.value))}
+            value={academicYear.id}
+            disabled
           >
-            {academicYears.map((academicYear) => (
-              <option key={academicYear.id} value={academicYear.id}>
-                {academicYear.name}
-              </option>
-            ))}
+            <option value={academicYear.id}>{academicYear.name}</option>
           </select>
         </div>
       </form>

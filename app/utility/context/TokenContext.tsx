@@ -1,6 +1,5 @@
 "use client";
 
-import { JwtPayload } from "jwt-decode";
 import {
   createContext,
   Dispatch,

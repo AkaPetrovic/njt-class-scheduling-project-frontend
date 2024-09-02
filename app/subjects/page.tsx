@@ -23,6 +23,9 @@ const SubjectsPage = async () => {
               <th>ID</th>
               <th>Name</th>
               <th>ESPB</th>
+              <th>Amount of lecture classes</th>
+              <th>Amount of practical classes</th>
+              <th>Amount of lab practical classes</th>
             </tr>
           </thead>
           <tbody className="[&_tr:not(:last-child)]:border-b [&_tr:not(:last-child)]:border-base-300">
@@ -34,6 +37,9 @@ const SubjectsPage = async () => {
                 <td>{subject.id}</td>
                 <td>{subject.name}</td>
                 <td>{subject.espb}</td>
+                <td>{subject.numberOfLectureClasses}</td>
+                <td>{subject.numberOfPracticalClasses}</td>
+                <td>{subject.numberOfLabPracticalClasses}</td>
               </tr>
             ))}
           </tbody>

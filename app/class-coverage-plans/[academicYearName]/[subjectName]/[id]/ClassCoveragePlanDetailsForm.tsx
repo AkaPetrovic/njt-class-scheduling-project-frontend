@@ -1,25 +1,23 @@
 "use client";
-import AcademicYear from "@/app/types/AcademicYear";
 import ClassCoveragePlan from "@/app/types/ClassCoveragePlan";
-import Subject from "@/app/types/Subject";
-import TeachingStaff from "@/app/types/TeachingStaff";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 interface Props {
   classCoveragePlan: ClassCoveragePlan;
-  teachingStaff: TeachingStaff[];
-  subjects: Subject[];
-  academicYears: AcademicYear[];
+  maxAssignedLectureClasses: number;
+  maxAssignedPracticalClasses: number;
+  maxAssignedLabPracticalClasses: number;
 }
 
 const ClassCoveragePlanDetailsForm = ({
   classCoveragePlan,
-  teachingStaff,
-  subjects,
-  academicYears,
+  maxAssignedLectureClasses,
+  maxAssignedPracticalClasses,
+  maxAssignedLabPracticalClasses,
 }: Props) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   // Feedback dialog related states and refs
   const feedbackDialogRef = useRef<HTMLDialogElement | null>(null);
@@ -36,70 +34,31 @@ const ClassCoveragePlanDetailsForm = ({
 
   const [classCoveragePlanData, setClassCoveragePlanData] =
     useState(classCoveragePlan);
-  const [selectedTeachingStaffId, setSelectedTeachingStaffId] = useState(
-    classCoveragePlan.teachingStaff.id
-  );
-  const [selectedSubjectId, setSelectedSubjectId] = useState(
-    classCoveragePlan.subject.id
-  );
-  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState(
-    classCoveragePlan.academicYear.id
-  );
+
   const [editingMode, setEditingMode] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    upperLimit: number
+  ) => {
     const { name, value } = e.target;
 
+    // Convert input value to a number (or handle empty value)
+    let newValue = value ? Number(value) : 0;
+
+    // Validate the value to ensure it stays within limits
+    if (newValue < 0) {
+      newValue = 0;
+    } else if (newValue > upperLimit) {
+      newValue = upperLimit;
+    }
+
+    // Update state with validated value
     setClassCoveragePlanData((prevData) => ({
       ...prevData,
-      [name]: value ? (Number(value) >= 0 ? Number(value) : 0) : 0,
+      [name]: newValue,
     }));
   };
-
-  //For handling teaching staff change
-  useEffect(() => {
-    const teachingStaffById = teachingStaff.find(
-      (staff) => staff.id === selectedTeachingStaffId
-    );
-
-    //If a teaching staff has been found by the find() function
-    if (teachingStaffById !== undefined) {
-      setClassCoveragePlanData((prevData) => ({
-        ...prevData,
-        teachingStaff: teachingStaffById,
-      }));
-    }
-  }, [selectedTeachingStaffId]);
-
-  //For handling subject change
-  useEffect(() => {
-    const subjectById = subjects.find(
-      (subject) => subject.id === selectedSubjectId
-    );
-
-    //If a subject has been found by the find() function
-    if (subjectById !== undefined) {
-      setClassCoveragePlanData((prevData) => ({
-        ...prevData,
-        subject: subjectById,
-      }));
-    }
-  }, [selectedSubjectId]);
-
-  //For handling academic year change
-  useEffect(() => {
-    const academicYearById = academicYears.find(
-      (academicYear) => academicYear.id === selectedAcademicYearId
-    );
-
-    //If an academic year has been found by the find() function
-    if (academicYearById !== undefined) {
-      setClassCoveragePlanData((prevData) => ({
-        ...prevData,
-        academicYear: academicYearById,
-      }));
-    }
-  }, [selectedAcademicYearId]);
 
   useEffect(() => {
     if (isFeedbackDialogOpen && feedbackDialogRef.current) {
@@ -163,7 +122,8 @@ const ClassCoveragePlanDetailsForm = ({
 
     if (feedbackDialogModalMessageType === "Success") {
       setEditingMode(false);
-      router.push("/");
+      const nextPath = pathname.split("/").slice(0, -1).join("/") + "/";
+      router.push(nextPath);
     }
   };
 
@@ -241,9 +201,6 @@ const ClassCoveragePlanDetailsForm = ({
           onClick={() => {
             setEditingMode(!editingMode);
             setClassCoveragePlanData(classCoveragePlan);
-            setSelectedAcademicYearId(classCoveragePlanData.academicYear.id);
-            setSelectedSubjectId(classCoveragePlanData.subject.id);
-            setSelectedTeachingStaffId(classCoveragePlanData.teachingStaff.id);
           }}
         >
           {editingMode ? "Cancel editing" : "Edit"}
@@ -286,7 +243,10 @@ const ClassCoveragePlanDetailsForm = ({
             htmlFor="amountOfLectureClassesPerTeachingStaff"
             className="mb-1"
           >
-            Amount of lecture classes:
+            Amount of lecture classes:{" "}
+            <span className="text-neutral-400">
+              (available: {maxAssignedLectureClasses})
+            </span>
           </label>
           <input
             id="amountOfLectureClassesPerTeachingStaff"
@@ -294,7 +254,7 @@ const ClassCoveragePlanDetailsForm = ({
             type="number"
             value={classCoveragePlanData.amountOfLectureClassesPerTeachingStaff}
             className="input input-bordered w-full max-w-20"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, maxAssignedLectureClasses)}
             disabled={!editingMode}
           />
         </div>
@@ -304,7 +264,10 @@ const ClassCoveragePlanDetailsForm = ({
             htmlFor="amountOfPracticalClassesPerTeachingStaff"
             className="mb-1"
           >
-            Amount of practical classes:
+            Amount of practical classes:{" "}
+            <span className="text-neutral-400">
+              (available: {maxAssignedPracticalClasses})
+            </span>
           </label>
           <input
             id="amountOfPracticalClassesPerTeachingStaff"
@@ -314,7 +277,7 @@ const ClassCoveragePlanDetailsForm = ({
               classCoveragePlanData.amountOfPracticalClassesPerTeachingStaff
             }
             className="input input-bordered w-full max-w-20"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, maxAssignedPracticalClasses)}
             disabled={!editingMode}
           />
         </div>
@@ -324,7 +287,10 @@ const ClassCoveragePlanDetailsForm = ({
             htmlFor="amountOfLabPracticalClassesPerTeachingStaff"
             className="mb-1"
           >
-            Amount of lab classes:
+            Amount of lab classes:{" "}
+            <span className="text-neutral-400">
+              (available: {maxAssignedLabPracticalClasses})
+            </span>
           </label>
           <input
             id="amountOfLabPracticalClassesPerTeachingStaff"
@@ -334,7 +300,9 @@ const ClassCoveragePlanDetailsForm = ({
               classCoveragePlanData.amountOfLabPracticalClassesPerTeachingStaff
             }
             className="input input-bordered w-full max-w-20"
-            onChange={handleInputChange}
+            onChange={(e) =>
+              handleInputChange(e, maxAssignedLabPracticalClasses)
+            }
             disabled={!editingMode}
           />
         </div>
@@ -346,16 +314,12 @@ const ClassCoveragePlanDetailsForm = ({
           <select
             id="classCoveragePlanTeachingStaff"
             className="select select-bordered w-full max-w-xs"
-            value={selectedTeachingStaffId}
-            onChange={(e) => setSelectedTeachingStaffId(Number(e.target.value))}
-            disabled={!editingMode}
+            value={classCoveragePlan.teachingStaff.id}
+            disabled
           >
-            {teachingStaff.map((staff) => (
-              <option
-                key={staff.id}
-                value={staff.id}
-              >{`${staff.name} ${staff.surname}`}</option>
-            ))}
+            <option
+              value={classCoveragePlan.teachingStaff.id}
+            >{`${classCoveragePlan.teachingStaff.name} ${classCoveragePlan.teachingStaff.surname}`}</option>
           </select>
         </div>
 
@@ -366,15 +330,12 @@ const ClassCoveragePlanDetailsForm = ({
           <select
             id="classCoveragePlanSubject"
             className="select select-bordered w-full max-w-xs"
-            value={selectedSubjectId}
-            onChange={(e) => setSelectedSubjectId(Number(e.target.value))}
-            disabled={!editingMode}
+            value={classCoveragePlan.subject.id}
+            disabled
           >
-            {subjects.map((subject) => (
-              <option key={subject.id} value={subject.id}>
-                {subject.name}
-              </option>
-            ))}
+            <option value={classCoveragePlan.subject.id}>
+              {classCoveragePlan.subject.name}
+            </option>
           </select>
         </div>
 
@@ -385,15 +346,12 @@ const ClassCoveragePlanDetailsForm = ({
           <select
             id="classCoveragePlanAcademicYear"
             className="select select-bordered w-full max-w-xs"
-            value={selectedAcademicYearId}
-            onChange={(e) => setSelectedAcademicYearId(Number(e.target.value))}
-            disabled={!editingMode}
+            value={classCoveragePlan.academicYear.id}
+            disabled
           >
-            {academicYears.map((academicYear) => (
-              <option key={academicYear.id} value={academicYear.id}>
-                {academicYear.name}
-              </option>
-            ))}
+            <option value={classCoveragePlan.academicYear.id}>
+              {classCoveragePlan.academicYear.name}
+            </option>
           </select>
         </div>
       </form>

@@ -15,9 +15,6 @@ const ClassCoveragePlanSelectionForm = ({ subjects, academicYears }: Props) => {
     academicYears[0]
   );
 
-  //   console.log(selectedAcademicYear);
-  //   console.log(selectedSubject);
-
   const handleAcademicYearSelectionChange = (academicYearId: number) => {
     const academicYearById = academicYears.find(
       (academicYear) => academicYear.id === academicYearId
