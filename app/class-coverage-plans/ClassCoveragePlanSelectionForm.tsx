@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Subject from "../types/Subject";
 import AcademicYear from "../types/AcademicYear";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface Props {
   subjects: Subject[];

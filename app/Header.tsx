@@ -2,7 +2,6 @@
 import { usePathname } from "next/navigation";
 import NavBar from "./NavBar";
 import Profile from "./Profile";
-import ReturnButton from "./ReturnButton";
 
 const Header = () => {
   const pathname = usePathname();
